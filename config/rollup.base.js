@@ -1,75 +1,34 @@
 import resolve from '@rollup/plugin-node-resolve';
-import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
-import alias from 'rollup-plugin-alias';
-import serve from 'rollup-plugin-serve'
-console.log('env1',process.env.ENV);
-export default [
-  {
-    input: './src/index.js',
-    output: {
-      dir: 'dist',
-      format: 'cjs',
-      entryFileNames: '[name].cjs.js',
-    },
-    plugins: [
-      alias({
-        resolve: ['.js']
-      }),
-      replace({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-      }),
-      resolve(), 
-      commonjs(), 
-      typescript()
-    ],
-  }, 
-  {
-    input: './src/index.js',
-    output: {
-      dir: 'dist',
-      format: 'esm',
-      entryFileNames: '[name].esm.js',
-    },
-    plugins: [
-      alias({
-        resolve: ['.js']
-      }),
-      replace({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-      }),
-      resolve(), 
-      commonjs(), 
-      typescript()
-    ],
-  },
-  {
-    input: './src/index.js',
-    output: {
-      dir: 'dist', // 出口路径
-      format: 'umd', // 模块规范
-      name:'Util', // 打包后的全局变量名字
-      entryFileNames: '[name].umd.js',
-    //   sourcemap: true // es6 -》 es5，开启源码调试，可以找到源代码报错的位置
-    },
-    plugins: [
-        resolve(), 
-        commonjs(), 
-        typescript(),
-        serve({
-            open:true,
-            openPage:'/example/index.html',
-            port:3000,
-            contentBase: [''],
-            verbose: true,
-            onListening: function (server) {
-                const address = server.address()
-                const host = address.address === '::' ? 'localhost' : address.address
-                // by using a bound function, we can access options as `this`
-                const protocol = this.https ? 'https' : 'http'
-                console.log(`Server listening at ${protocol}://${host}:${address.port}/`)
-              }
-        })
-],
-  },
-];
+import replace from 'rollup-plugin-replace'
+import { name } from '../package.json';
+
+export default {
+  input:'src/index',
+  output: [
+	// umd development version with sourcemap
+	{
+	  file: `dist/${name}.js`,
+	  format: 'umd',
+	  name,
+	  sourcemap: true
+	},
+	// cjs and esm version
+	{
+	  file: `dist/${name}.cjs.js`,
+	  format: 'cjs',
+	},
+	// cjs and esm version
+	{
+	  file: `dist/${name}.esm.js`,
+	  format: 'es',
+	}
+  ],
+  plugins:[
+	resolve(), 
+	commonjs(), 
+	replace({
+		'process.env.ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+	})
+  ]
+}

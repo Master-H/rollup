@@ -1,54 +1,58 @@
-import resolve from '@rollup/plugin-node-resolve';
-import typescript from '@rollup/plugin-typescript';
-import commonjs from '@rollup/plugin-commonjs';
-import serve from 'rollup-plugin-serve'
-console.log('env1',process.env.ENV);
+import baseConfig from './rollup.base'
+import { name, version, author } from '../package.json';
+import { terser } from 'rollup-plugin-terser'
+import filesize from 'rollup-plugin-filesize'
+
+// banner
+const banner =
+  `${'/*!\n' + ' * '}${name}.js v${version}\n` +
+  ` * (c) 2018-${new Date().getFullYear()} ${author}\n` +
+  ` * Released under the MIT License.\n` +
+  ` */`;
+
 export default [
   {
-    input: './src/index.js',
-    output: {
-      dir: 'dist',
-      format: 'cjs',
-      entryFileNames: '[name].cjs.js',
-    },
-    // plugins: [resolve(), commonjs(), typescript()],
-  }, 
-  {
-    input: './src/index.js',
-    output: {
-      dir: 'dist',
-      format: 'esm',
-      entryFileNames: '[name].esm.js',
-    },
-    // plugins: [resolve(), commonjs(), typescript()],
+    ...baseConfig,
+    output: [
+      // umd development version with sourcemap
+      {
+        file: `dist/${name}.js`,
+        format: 'umd',
+        name,
+        banner,
+        sourcemap: true
+      },
+      // cjs and esm version
+      {
+        file: `dist/${name}.cjs.js`,
+        format: 'cjs',
+        banner
+      },
+      // cjs and esm version
+      {
+        file: `dist/${name}.esm.js`,
+        format: 'es',
+        banner
+      }
+    ],
+    plugins: [...baseConfig.plugins,filesize()]
   },
+  // .min.js
   {
-    input: './src/index.js',
-    output: {
-      dir: 'dist', // 出口路径
-      format: 'umd', // 模块规范
-      name:'Util', // 打包后的全局变量名字
-      entryFileNames: '[name].umd.js',
-    //   sourcemap: true // es6 -》 es5，开启源码调试，可以找到源代码报错的位置
-    },
+    ...baseConfig,
+    output: [
+      // umd with compress version
+      {
+        file: `dist/${name}.min.js`,
+        format: 'umd',
+        name,
+        banner
+      }
+    ],
     plugins: [
-        // resolve(), 
-        // commonjs(), 
-        // typescript(),
-        serve({
-            open:true,
-            openPage:'/example/index.html',
-            port:3000,
-            contentBase: [''],
-            verbose: true,
-            onListening: function (server) {
-                const address = server.address()
-                const host = address.address === '::' ? 'localhost' : address.address
-                // by using a bound function, we can access options as `this`
-                const protocol = this.https ? 'https' : 'http'
-                console.log(`Server listening at ${protocol}://${host}:${address.port}/`)
-              }
-        })
-],
-  },
-];
+	  ...baseConfig.plugins,
+	  filesize(),
+	  terser()
+    ]
+  }
+]

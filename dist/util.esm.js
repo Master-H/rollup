@@ -1,6 +1,5 @@
 const add = () => {
     console.log('add');
-    
 };
 
 const isArray = () => {
