@@ -5,6 +5,7 @@ import baseConfig from './rollup.base'
 export default {
   ...baseConfig,
   plugins:[
+    ...baseConfig.plugins,
     filesize(),
     serve({
       open:true,

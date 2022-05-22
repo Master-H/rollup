@@ -1,7 +1,8 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import replace from 'rollup-plugin-replace'
-import babel from 'rollup-plugin-babel'
+// import babel from '@rollup/plugin-babel';
+import babel from 'rollup-plugin-babel';
 import { name } from '../package.json';
 
 export default {
@@ -26,14 +27,18 @@ export default {
 	}
   ],
   plugins:[
+	babel({
+		runtimeHelpers: true,
+		exclude: "node_modules/**",
+		externalHelpers: true
+	  }),
 	resolve(), 
 	commonjs(), 
+	// babel(), // babel配置,编译es6
+	// babel({ babelHelpers: "bundled" }), // babel配置,编译es6
 	replace({
 		'process.env.ENV': JSON.stringify(process.env.NODE_ENV || 'development')
 	}),
-	// babel({
-	// 	runtimeHelpers: true,
-    //   	exclude: 'node_modules/**' // only transpile our source code
-	// })
+
   ]
 }

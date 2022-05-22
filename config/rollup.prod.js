@@ -50,9 +50,9 @@ export default [
       }
     ],
     plugins: [
-	  ...baseConfig.plugins,
-	  filesize(),
-	  terser()
+      ...baseConfig.plugins,
+      filesize(),
+      terser()
     ]
   }
 ]
