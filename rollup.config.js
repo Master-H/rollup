@@ -8,5 +8,4 @@ const rollup = {
     dev,
     prod
 }
-console.log('rollup[env]',rollup[env]);
 export default rollup[env] || 'dev'

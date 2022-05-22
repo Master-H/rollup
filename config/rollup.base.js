@@ -1,6 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import replace from 'rollup-plugin-replace'
+import babel from 'rollup-plugin-babel'
 import { name } from '../package.json';
 
 export default {
@@ -8,7 +9,7 @@ export default {
   output: [
 	// umd development version with sourcemap
 	{
-	  file: `dist/${name}.js`,
+	  file: `dist/${name}.umd.js`,
 	  format: 'umd',
 	  name,
 	  sourcemap: true
@@ -29,6 +30,10 @@ export default {
 	commonjs(), 
 	replace({
 		'process.env.ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-	})
+	}),
+	// babel({
+	// 	runtimeHelpers: true,
+    //   	exclude: 'node_modules/**' // only transpile our source code
+	// })
   ]
 }
